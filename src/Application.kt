@@ -14,12 +14,14 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.collections.ArrayList
 
+private val logger = Logger()
+
 fun main(args: Array<String>) {
     initDB()
     embeddedServer(Netty, 8080) {
         routing {
             get("/") {
-                println(getTopUsers())
+                logger.log(getTopUsers())
             }
         }
     }.start(wait = true)
@@ -48,33 +50,4 @@ fun getTopUsers(): String{
         json = Gson().toJson(list)
     }
     return json
-}
-
-fun template(fruitsJson: String): String {
-    return StringBuilder().appendHTML().html {
-        lang = "en"
-        head {
-            meta { charset = "UTF-8" }
-            title { +"Store" }
-            style {
-                +"""html, body, #container {
-                        width: 400px;
-                        height: 400px;
-                        margin: 0;
-                        padding: 0;
-                    }""".trimIndent()
-            }
-        }
-        body {
-            div { id = "container" }
-            script {
-                unsafe {
-                    +"""var chart = anychart.pie($fruitsJson);
-                    chart.container('container');
-                    chart.draw();
-                """
-                }
-            }
-        }
-    }.toString()
 }
