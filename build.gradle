@@ -27,6 +27,8 @@ repositories {
     jcenter()
     maven { url 'https://kotlin.bintray.com/ktor' }
     maven { url 'https://kotlin.bintray.com/kotlin-js-wrappers' }
+    maven { url "https://dl.bintray.com/kotlin/kotlinx" }
+    maven { url "https://dl.bintray.com/kotlin/exposed" }
 }
 
 dependencies {
@@ -40,4 +42,9 @@ dependencies {
     implementation "io.ktor:ktor-client-core-jvm:$ktor_version"
     implementation "io.ktor:ktor-client-apache:$ktor_version"
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
+
+    compile 'org.jetbrains.exposed:exposed:0.8.5'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.11'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+
 }

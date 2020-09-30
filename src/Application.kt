@@ -1,68 +1,80 @@
 package com.example
 
+import com.google.gson.Gson
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import io.ktor.http.*
-import io.ktor.html.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import kotlinx.html.*
-import kotlinx.css.*
-import io.ktor.client.*
-import io.ktor.client.engine.apache.*
+import kotlinx.html.stream.appendHTML
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
+import kotlin.collections.ArrayList
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
-
-@Suppress("unused") // Referenced in application.conf
-@kotlin.jvm.JvmOverloads
-fun Application.module(testing: Boolean = false) {
-    val client = HttpClient(Apache) {
-    }
-
-    routing {
-        get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+fun main(args: Array<String>) {
+    initDB()
+    embeddedServer(Netty, 8080) {
+        routing {
+            get("/") {
+                println(getTopUsers())
+            }
         }
+    }.start(wait = true)
+}
 
-        get("/html-dsl") {
-            call.respondHtml {
-                body {
-                    h1 { +"HTML" }
-                    ul {
-                        for (n in 1..10) {
-                            li { +"$n" }
-                        }
-                    }
+fun initDB() {
+    val url = "jdbc:mysql://nativeuser:password@localhost:3306/shop?useUnicode=true&serverTimezone=UTC"
+    val driver = "com.mysql.cj.jdbc.Driver"
+    Database.connect(url, driver)
+}
+
+object Users : Table("users"){
+    val username = varchar("name", length = 45)
+    val id = integer("id")
+}
+
+fun getTopUsers(): String{
+    var json: String = ""
+    transaction {
+        val res = Users.selectAll().orderBy(Users.id)
+        println(res)
+        val list = ArrayList<User>()
+        for (u in res){
+            list.add(User(id = u[Users.id], name = u[Users.username]))
+        }
+        json = Gson().toJson(list)
+    }
+    return json
+}
+
+fun template(fruitsJson: String): String {
+    return StringBuilder().appendHTML().html {
+        lang = "en"
+        head {
+            meta { charset = "UTF-8" }
+            title { +"Store" }
+            style {
+                +"""html, body, #container {
+                        width: 400px;
+                        height: 400px;
+                        margin: 0;
+                        padding: 0;
+                    }""".trimIndent()
+            }
+        }
+        body {
+            div { id = "container" }
+            script {
+                unsafe {
+                    +"""var chart = anychart.pie($fruitsJson);
+                    chart.container('container');
+                    chart.draw();
+                """
                 }
             }
         }
-
-        get("/styles.css") {
-            call.respondCss {
-                body {
-                    backgroundColor = Color.red
-                }
-                p {
-                    fontSize = 2.em
-                }
-                rule("p.myclass") {
-                    color = Color.blue
-                }
-            }
-        }
-    }
-}
-
-fun FlowOrMetaDataContent.styleCss(builder: CSSBuilder.() -> Unit) {
-    style(type = ContentType.Text.CSS.toString()) {
-        +CSSBuilder().apply(builder).toString()
-    }
-}
-
-fun CommonAttributeGroupFacade.style(builder: CSSBuilder.() -> Unit) {
-    this.style = CSSBuilder().apply(builder).toString().trim()
-}
-
-suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit) {
-    this.respondText(CSSBuilder().apply(builder).toString(), ContentType.Text.CSS)
+    }.toString()
 }
