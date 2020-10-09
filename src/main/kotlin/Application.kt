@@ -1,45 +1,66 @@
 package com.example
 
 import com.example.repository.User
-import com.example.repository.Users
+import com.example.repository.UserRepository
+import com.example.service.UserService
+import com.example.service.UserServiceImp
 import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import kotlin.collections.ArrayList
 
 private val logger = Logger()
 
-fun Routing.rout(){
+private val userService = UserServiceImp(UserRepository()) as UserService
+
+fun Routing.rout() {
     get("/users") {
-        var json: String = ""
-        transaction {
-            val res = Users.selectAll().orderBy(Users.id)
-            val list = ArrayList<User>()
-            for (user in res)
-                list.add(User(
-                    id = user[Users.id],
-                    username = user[Users.username],
-                    firstName = user[Users.firstName],
-                    secondName = user[Users.secondName],
-                    password = user[Users.password],
-                    role = user[Users.role],
-                    group = user[Users.group]
-                ))
-            json = Gson().toJson(list)
+        val users = transaction {
+            userService.getAll()
         }
-        call.respondText(json, ContentType.Text.Html)
+        call.respond(users.toString())
+    }
+    post("/users") {
+        logger.log("Initiated post request")
+        val userString = call.receive<String>()
+        val userJson = JsonParser().parse(userString).asJsonObject
+        val password = "5f4dcc3b5aa765d61d8327deb882cf99"
+
+        var username = userJson.get("username").toString()
+        username = username.substring(1, username.length - 1)
+        var firstName = userJson.get("firstName").toString()
+        firstName = firstName.substring(1, firstName.length - 1)
+        var secondName = userJson.get("secondName").toString()
+        secondName = secondName.substring(1, secondName.length - 1)
+        var role = userJson.get("role").toString()
+        role = role.substring(1, role.length - 1)
+        var group = userJson.get("group").toString()
+        group = group.substring(1, group.length - 1)
+
+        val user = User(
+            id = 300,
+            username = username,
+            firstName = firstName,
+            secondName = secondName,
+            password = password,
+            role = role,
+            group = group
+        )
+        transaction {
+            userService.create(user)
+        }
+        call.respond("Affirmative user addition")
     }
 }
 
 fun initDB() {
-    val url = "jdbc:mysql://nativeuser:password@localhost:3306/journal?useUnicode=true&serverTimezone=UTC"
-    val driver = "com.mysql.jdbc.Driver"
     Database.connect(
         "jdbc:mysql://localhost:3306/journal?useUnicode=true&serverTimezone=UTC",
         driver = "com.mysql.jdbc.Driver",

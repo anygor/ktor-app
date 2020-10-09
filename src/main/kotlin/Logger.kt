@@ -1,9 +1,9 @@
 package com.example
 
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.LogManager
 
 class Logger{
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val logger = LogManager.getLogger("ApplicationKt".javaClass)
 
     fun log(s: String) {
         logger.info(s)

@@ -48,6 +48,10 @@ dependencies {
     // MySQL
     implementation("mysql:mysql-connector-java:5.1.48")
 
+    // logger
+    implementation("org.apache.logging.log4j", "log4j-api", "2.13.3")
+    implementation("org.apache.logging.log4j", "log4j-core", "2.13.3")
+
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
