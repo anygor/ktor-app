@@ -15,15 +15,6 @@ import kotlin.collections.ArrayList
 
 private val logger = Logger()
 
-fun main(args: Array<String>) {
-    initDB()
-    embeddedServer(Netty, 8080) {
-        routing {
-            rout()
-        }
-    }.start(wait = true)
-}
-
 fun Routing.rout(){
     get("/users") {
         var json: String = ""
@@ -48,7 +39,21 @@ fun Routing.rout(){
 
 fun initDB() {
     val url = "jdbc:mysql://nativeuser:password@localhost:3306/journal?useUnicode=true&serverTimezone=UTC"
-    val driver = "com.mysql.cj.jdbc.Driver"
-    Database.connect(url, driver)
+    val driver = "com.mysql.jdbc.Driver"
+    Database.connect(
+        "jdbc:mysql://localhost:3306/journal?useUnicode=true&serverTimezone=UTC",
+        driver = "com.mysql.jdbc.Driver",
+        user = "nativeuser", password = "password"
+    )
+}
+
+
+fun main(args: Array<String>) {
+    initDB()
+    embeddedServer(Netty, 8080) {
+        routing {
+            rout()
+        }
+    }.start(wait = true)
 }
 
