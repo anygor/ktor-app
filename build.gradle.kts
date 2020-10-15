@@ -40,6 +40,7 @@ dependencies {
 
     //Gson
     implementation("com.google.code.gson:gson:2.8.5")
+    implementation("io.ktor:ktor-gson:1.3.2")
 
     // Exposed Core, JDBC
     implementation("org.jetbrains.exposed", "exposed-core", "0.24.1")
@@ -51,6 +52,12 @@ dependencies {
     // logger
     implementation("org.apache.logging.log4j", "log4j-api", "2.13.3")
     implementation("org.apache.logging.log4j", "log4j-core", "2.13.3")
+
+    // swagger
+    implementation("de.nielsfalk.ktor", "ktor-swagger", "0.5.0")
+
+    // clikt
+    implementation("com.github.ajalt", "clikt", "1.3.0")
 
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
@@ -66,7 +73,7 @@ application {
 
 tasks {
     named<ShadowJar>("shadowJar") {
-        archiveBaseName.set("kotlin-application")
+        archiveBaseName.set("ktor-app")
         mergeServiceFiles()
         manifest {
             attributes(mapOf("Main-Class" to "ApplicationKt"))

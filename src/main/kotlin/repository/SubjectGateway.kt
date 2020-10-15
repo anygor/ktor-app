@@ -1,5 +1,6 @@
 package com.example.repository
 
+import com.example.model.Subject
 import org.jetbrains.exposed.sql.*
 
 interface SubjectGateway {
@@ -9,11 +10,6 @@ interface SubjectGateway {
     fun getSubject(id: Int): Subject?
     fun deleteSubject(id: Int)
 }
-
-data class Subject(
-    val id: Int,
-    var subjectName: String
-)
 
 object Subjects : Table() {
     val id = integer("id").autoIncrement().primaryKey()
