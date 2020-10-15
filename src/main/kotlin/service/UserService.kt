@@ -1,6 +1,6 @@
 package com.example.service
 
-import com.example.repository.User
+import com.example.model.User
 import com.example.repository.UserGateway
 
 interface UserService {

@@ -1,6 +1,6 @@
 package com.example.service
 
-import com.example.repository.Mark
+import com.example.model.Mark
 import com.example.repository.MarkGateway
 
 interface MarkService {

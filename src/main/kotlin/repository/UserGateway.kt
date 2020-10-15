@@ -1,5 +1,6 @@
 package com.example.repository
 
+import com.example.model.User
 import org.jetbrains.exposed.sql.*
 
 interface UserGateway {
@@ -9,16 +10,6 @@ interface UserGateway {
     fun getUser(id: Int): User?
     fun deleteUser(id: Int)
 }
-
-data class User(
-    val id: Int,
-    var username: String,
-    var firstName: String,
-    var secondName: String,
-    var password: String,
-    var role: String,
-    var group: String?
-)
 
 object Users : Table() {
     val id = integer("id").autoIncrement().primaryKey()

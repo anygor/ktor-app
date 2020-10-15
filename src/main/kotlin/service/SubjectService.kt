@@ -1,6 +1,6 @@
 package com.example.service
 
-import com.example.repository.Subject
+import com.example.model.Subject
 import com.example.repository.SubjectGateway
 
 interface SubjectService {

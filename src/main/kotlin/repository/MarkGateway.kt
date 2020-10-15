@@ -1,5 +1,6 @@
 package com.example.repository
 
+import com.example.model.Mark
 import org.jetbrains.exposed.sql.*
 
 interface MarkGateway {
@@ -9,13 +10,6 @@ interface MarkGateway {
     fun getMark(id: Int): Mark?
     fun deleteMark(id: Int)
 }
-
-data class Mark(
-    val id: Int,
-    val subjectId: Int,
-    val studentId: Int,
-    val markValue: String
-)
 
 object Marks : Table() {
     val id = integer("id").autoIncrement().primaryKey()
